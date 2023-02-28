@@ -1,0 +1,25 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+       python: 3.9
+       nodejs: 16
+    commands:
+      - echo "Running pre build commands - $STAGE_NAME"
+      - npm install --save-dev serverless
+  pre_build:
+    commands:
+      #- pip freeze > requirements.txt
+      - cp serverless_prod.yml serverless.yml
+      - npx serverless plugin install -n serverless-python-requirements
+      - npx serverless plugin install -n serverless-offline
+      - npx serverless plugin install -n serverless-prune-plugin
+      - python3.9 -m venv env
+      - source env/bin/activate
+      - pip3 install -r requirements.txt
+  build:
+    commands:
+      - npx serverless deploy --verbose --stage v1
+  post_build:
+    commands:
+      - echo "Complete all the steps"

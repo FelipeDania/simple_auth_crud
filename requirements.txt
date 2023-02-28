@@ -1,0 +1,5 @@
+pymongo==3.10.1
+PyJWT==1.7.1
+aws_lambda_powertools==1.11.0
+dnspython==1.16.0
+bcrypt

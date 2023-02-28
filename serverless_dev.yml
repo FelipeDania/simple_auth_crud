@@ -1,0 +1,99 @@
+service: simple_auth_crud
+frameworkVersion: '>=2'
+
+provider:
+  name: aws
+  runtime: python3.9
+  logRetentionInDays: 7
+  timeout: 30
+
+  stage: ${self:custom.customStage}
+  region: ${self:custom.customRegion}
+  vpc:
+    securityGroupIds:
+      - ${self:custom.customSecurityGroupIds}
+    subnetIds: ${self:custom.customSubnetIds}
+
+  environment:
+    STAGE: ${self:provider.stage}
+    LOG_LEVEL: DEBUG
+    MONGO_URI: 'stringConnection'
+    MONGO_DBNAME: 'dbName'
+
+package:
+  exclude:
+    - env/**
+    - node_modules/**
+    - tests/**
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+  - serverless-prune-plugin
+  #- serverless-reqvalidator-plugin
+  #- serverless-aws-documentation
+
+functions:
+
+  #auth_function:
+  #  handler: functions/auth.read
+  #  memorySize: 128
+  #  events:
+  #    - http:
+  #        path: /login/
+  #        method: POST
+  #        cors:
+  #          origin: '*'
+
+  create_user:
+    handler: functions/user.create_user
+    memorySize: 128
+    events:
+      - http:
+          #reqValidatorName: 'CreateUserRequestValidator'
+          path: /create_user/
+          method: POST
+          request:
+            schemas:
+              application/json: ${file(models/create-todo-model.json)}
+          #authorizer:
+          #  name: auth_function
+          #  resultTtlInSeconds: 30
+          #cors:
+          #  origin: '*'
+
+  #find_user:
+  #  handler: functions/user.get_user
+  #  memorySize: 180
+  #  timeout: 10
+  #  events:
+  #    - http:
+  #        path: /find_user/{user_id}
+  #        method: GET
+  #        authorizer:
+  #          name: auth_function
+  #          resultTtlInSeconds: 30
+  #        cors:
+  #          origin: '*'
+
+custom:
+  resultTtlInSeconds: 720
+
+  ##########################
+  # production environment
+  ##########################
+  customStage: dev
+  customRegion: us-east-1
+  customSecurityGroupIds: sg-....
+  customSubnetIds:
+    - subnet-....
+    - subnet-....
+
+  #CreateUserRequestValidator:  
+  #    Type: "AWS::ApiGateway::RequestValidator"
+  #    Properties:
+  #      Name: 'my-req-validator'
+  #      RestApiId: 
+  #        Ref: ApiGatewayRestApi
+  #      ValidateRequestBody: true
+  #      ValidateRequestParameters: false

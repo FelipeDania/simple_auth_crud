@@ -1,3 +1,10 @@
+#TO DO...validation before commit
+*tests*
+
+#node package
+*package*.json*
+*node_modules*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
